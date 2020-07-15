@@ -21,9 +21,10 @@ func defaults() (them map[string]int) {
 	return
 }
 
-func contextQueryStrings(request *http.Request) (modified *http.Request, ok bool, code int, r_map map[string]interface{}, err error) {
+func contextQueryStrings(request *http.Request) (modified *http.Request, ok bool, code int, _ map[string]interface{}, err error) {
 	var parsed map[string]int = defaults()
-	var limit int
+	var limited bool
+	var limit, it int
 
 	var key string
 	var value []string
@@ -32,18 +33,17 @@ func contextQueryStrings(request *http.Request) (modified *http.Request, ok bool
 			continue
 		}
 
-		if parsed[key], err = strconv.Atoi(value[0]); err != nil {
+		limit, limited = limits[key]
+		it, err = strconv.Atoi(value[0])
+		switch {
+		case err != nil:
 			err = nil
 			code = 400
 			return
-		}
-
-		if limit, ok = limits[key]; !ok {
-			continue
-		}
-
-		if parsed[key] > limit {
-			parsed[key] = limit
+		case it > limit && limited:
+			parsed[key] = limits[key]
+		case it > 0 && (!limited || it <= limit):
+			parsed[key] = it
 		}
 	}
 
