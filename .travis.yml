@@ -9,7 +9,7 @@ script:
     - go test ./... -count 1 -cover -coverprofile coverage.txt
     - bash <(curl -s https://codecov.io/bash)
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
-    - docker build . -t gastrodon/imonke-feed-create-service:"$TRAVIS_BRANCH"
-    - docker push gastrodon/imonke-feed-create-service:"$TRAVIS_BRANCH"
-    - docker tag gastrodon/imonke-feed-create-service:"$TRAVIS_BRANCH" gastrodon/imonke-feed-create-service:latest
-    - if [ "$TRAVIS_BRANCH" = "master" ]; then docker push gastrodon/imonke-feed-create-service:latest; fi
+    - docker build . -t gastrodon/imonke-feed-giver-service:"$TRAVIS_BRANCH"
+    - docker push gastrodon/imonke-feed-giver-service:"$TRAVIS_BRANCH"
+    - docker tag gastrodon/imonke-feed-giver-service:"$TRAVIS_BRANCH" gastrodon/imonke-feed-giver-service:latest
+    - if [ "$TRAVIS_BRANCH" = "master" ]; then docker push gastrodon/imonke-feed-giver-service:latest; fi
