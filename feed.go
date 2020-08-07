@@ -19,7 +19,7 @@ func feedAll(request *http.Request) (code int, r_map map[string]interface{}, err
 	code = 200
 	r_map = map[string]interface{}{
 		"content": content,
-		"size":    size,
+		"size":    map[string]int{"content": size},
 	}
 	return
 }

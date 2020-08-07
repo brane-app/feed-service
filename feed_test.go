@@ -70,7 +70,6 @@ func TestMain(main *testing.M) {
 	os.Exit(result)
 }
 
-// honestly fuck these tests they're so ugly and gross idc anymore
 func Test_feedAll(test *testing.T) {
 	var query map[string]int
 	var queries []map[string]int = []map[string]int{
@@ -111,7 +110,7 @@ func Test_feedAll(test *testing.T) {
 			test.Errorf("got code %d", code)
 		}
 
-		size = r_map["size"].(int)
+		size = r_map["size"].(map[string]int)["content"]
 		fetched = r_map["content"].([]monketype.Content)
 
 		if size != query["size"] {
@@ -158,7 +157,7 @@ func Test_feedAll_some(test *testing.T) {
 		test.Errorf("got code %d", code)
 	}
 
-	var size int = r_map["size"].(int)
+	var size int = r_map["size"].(map[string]int)["content"]
 	var fetched []monketype.Content = r_map["content"].([]monketype.Content)
 
 	if size != projected {
