@@ -3,8 +3,8 @@ module github.com/imonke/feed-giver-service
 go 1.13
 
 require (
-	github.com/gastrodon/groudon v0.0.0-20200711221335-e03fb5f2db52
-	github.com/imonke/monkebase v0.0.0-20200717040938-ff87d755de3e
-	github.com/imonke/monkelib v0.0.0-20200718153650-0de4bf0665e9
-	github.com/imonke/monketype v0.0.0-20200716234900-cc809fe194ca
+	github.com/gastrodon/groudon v0.0.0-20200810225227-33d8da43a46d
+	github.com/imonke/monkebase v0.0.0-20201111032832-5890c2b1cc4c
+	github.com/imonke/monkelib v0.0.0-20201111060014-0ab4477be8e3
+	github.com/imonke/monketype v0.0.0-20201108235822-b761f9de344a
 )
