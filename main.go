@@ -12,7 +12,7 @@ import (
 
 func main() {
 	monkebase.Connect(os.Getenv("MONKEBASE_CONNECTION"))
-	groudon.RegisterMiddleware(middleware.RangeQueryParams)
+	groudon.RegisterMiddleware(middleware.PaginationParams)
 	groudon.RegisterHandler("GET", "^/all/?", feedAll)
 	http.Handle("/", http.HandlerFunc(groudon.Route))
 	log.Fatal(http.ListenAndServe(":8000", nil))
