@@ -64,41 +64,26 @@ func sequenceOK(test *testing.T, content []monketype.Content) {
 
 func TestMain(main *testing.M) {
 	monkebase.Connect(os.Getenv("MONKEBASE_CONNECTION"))
+	seed(100)
 
 	var result int = main.Run()
-	monkebase.EmptyTable(monkebase.USER_TABLE)
+	monkebase.EmptyTable(monkebase.CONTENT_TABLE)
 	os.Exit(result)
 }
 
 func Test_feedAll(test *testing.T) {
-	var query map[string]int
-	var queries []map[string]int = []map[string]int{
-		map[string]int{
-			"offset": 0,
-			"size":   10,
-		},
-		map[string]int{
-			"offset": 10,
-			"size":   20,
-		},
-	}
-
-	monkebase.EmptyTable(monkebase.CONTENT_TABLE)
-	seed(40)
-	defer monkebase.EmptyTable(monkebase.CONTENT_TABLE)
-
+	var targets [5]int = [5]int{10, 20, 30, 40, 50}
+	var content []monketype.Content
 	var request *http.Request
-	var fetched []monketype.Content
-	var code, size int
+	var code, size, target int
 	var r_map map[string]interface{}
 	var err error
-
-	for _, query = range queries {
+	for _, target = range targets {
 		request = blank.WithContext(
 			context.WithValue(
 				blank.Context(),
-				"parsed_query",
-				query,
+				"query",
+				map[string]interface{}{"size": target, "after": ""},
 			),
 		)
 
@@ -107,66 +92,67 @@ func Test_feedAll(test *testing.T) {
 		}
 
 		if code != 200 {
-			test.Errorf("got code %d", code)
+			test.Errorf("bad code %d", code)
 		}
 
 		size = r_map["size"].(map[string]int)["content"]
-		fetched = r_map["content"].([]monketype.Content)
+		content = r_map["content"].([]monketype.Content)
 
-		if size != query["size"] {
-			test.Errorf("wanted size mismatch! have: %d, want: %d", size, query["size"])
+		if size != target {
+			test.Errorf("bad reported size %d, want: %d", size, target)
 		}
 
-		if len(fetched) != query["size"] {
-			test.Errorf("actual size mismatch! have: %d, want: %d", len(fetched), query["size"])
+		if len(content) != target {
+			test.Errorf("bad actual size %d, want: %d", len(content), target)
 		}
 
-		sequenceOK(test, fetched)
+		sequenceOK(test, content)
 	}
 }
 
-func Test_feedAll_some(test *testing.T) {
-	var population = 20
-	var query map[string]int = map[string]int{
-		"offset": 10,
-		"size":   20,
-	}
+func Test_feedAll_after(test *testing.T) {
+	var target, offset int = 50, 11
+	var first, second []monketype.Content
+	var request *http.Request
+	var r_map map[string]interface{}
+	var err error
 
-	var projected = population - query["offset"]
-
-	monkebase.EmptyTable(monkebase.CONTENT_TABLE)
-	seed(population)
-	defer monkebase.EmptyTable(monkebase.CONTENT_TABLE)
-
-	var request *http.Request = blank.WithContext(
+	request = blank.WithContext(
 		context.WithValue(
 			blank.Context(),
-			"parsed_query",
-			query,
+			"query",
+			map[string]interface{}{"size": target, "after": ""},
 		),
 	)
 
-	var code int
-	var r_map map[string]interface{}
-	var err error
-	if code, r_map, err = feedAll(request); err != nil {
+	if _, r_map, err = feedAll(request); err != nil {
 		test.Fatal(err)
 	}
 
-	if code != 200 {
-		test.Errorf("got code %d", code)
+	first = r_map["content"].([]monketype.Content)
+
+	request = blank.WithContext(
+		context.WithValue(
+			blank.Context(),
+			"query",
+			map[string]interface{}{"size": target, "after": first[offset].ID},
+		),
+	)
+
+	if _, r_map, err = feedAll(request); err != nil {
+		test.Fatal(err)
 	}
 
-	var size int = r_map["size"].(map[string]int)["content"]
-	var fetched []monketype.Content = r_map["content"].([]monketype.Content)
+	second = r_map["content"].([]monketype.Content)
 
-	if size != projected {
-		test.Errorf("wanted size mismatch! have: %d, want: %d", projected, size)
+	sequenceOK(test, first)
+	sequenceOK(test, second)
+
+	var index int
+	var content monketype.Content
+	for index, content = range first[offset+1:] {
+		if content.ID != second[index].ID {
+			test.Errorf("IDs are not aligned at %d: %s != %s", index, content.ID, second[index].ID)
+		}
 	}
-
-	if len(fetched) != projected {
-		test.Errorf("actual size mismatch! have: %d, want: %d", len(fetched), projected)
-	}
-
-	sequenceOK(test, fetched)
 }
