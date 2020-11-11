@@ -8,11 +8,11 @@ import (
 )
 
 func feedAll(request *http.Request) (code int, r_map map[string]interface{}, err error) {
-	var parsed map[string]int = request.Context().Value("parsed_query").(map[string]int)
-
+	var parsed map[string]interface{} = request.Context().Value("query").(map[string]interface{})
+	var size int = parsed["size"].(int)
+	var after string = parsed["after"].(string)
 	var content []monketype.Content
-	var size int
-	if content, size, err = monkebase.ReadManyContent(parsed["offset"], parsed["size"]); err != nil {
+	if content, size, err = monkebase.ReadManyContent(after, size); err != nil {
 		return
 	}
 
