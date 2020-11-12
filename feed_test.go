@@ -83,7 +83,7 @@ func Test_feedAll(test *testing.T) {
 			context.WithValue(
 				blank.Context(),
 				"query",
-				map[string]interface{}{"size": target, "after": ""},
+				map[string]interface{}{"size": target, "before": ""},
 			),
 		)
 
@@ -121,7 +121,7 @@ func Test_feedAll_after(test *testing.T) {
 		context.WithValue(
 			blank.Context(),
 			"query",
-			map[string]interface{}{"size": target, "after": ""},
+			map[string]interface{}{"size": target, "before": ""},
 		),
 	)
 
@@ -135,7 +135,7 @@ func Test_feedAll_after(test *testing.T) {
 		context.WithValue(
 			blank.Context(),
 			"query",
-			map[string]interface{}{"size": target, "after": first[offset].ID},
+			map[string]interface{}{"size": target, "before": first[offset].ID},
 		),
 	)
 
