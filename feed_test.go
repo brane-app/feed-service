@@ -63,7 +63,7 @@ func sequenceOK(test *testing.T, content []monketype.Content) {
 }
 
 func TestMain(main *testing.M) {
-	monkebase.Connect(os.Getenv("MONKEBASE_CONNECTION"))
+	monkebase.Connect(os.Getenv("DATABASE_CONNECTION"))
 	seed(100)
 
 	var result int = main.Run()
