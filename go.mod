@@ -1,4 +1,4 @@
-module git.gastrodon.io/imonke/feed-giver-service
+module github.com/brane-app/feed-giver-service
 
 go 1.13
 
