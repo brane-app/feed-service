@@ -1,8 +1,8 @@
 package main
 
 import (
-	"git.gastrodon.io/imonke/monkebase"
-	"git.gastrodon.io/imonke/monketype"
+	"github.com/brane-app/database-library"
+	"github.com/brane-app/types-library"
 
 	"context"
 	"net/http"
@@ -26,12 +26,12 @@ const (
 
 var (
 	blank *http.Request  = new(http.Request)
-	user  monketype.User = monketype.NewUser(nick, "", email)
+	user  types.User = types.NewUser(nick, "", email)
 )
 
 func seed(size int) {
 	for size != 0 {
-		monkebase.WriteContent(monketype.NewContent("", user.ID, "png", nil, true, false).Map())
+		database.WriteContent(types.NewContent("", user.ID, "png", nil, true, false).Map())
 		size--
 	}
 }
@@ -45,9 +45,9 @@ func urlMustParse(it string) (parsed *url.URL) {
 	return
 }
 
-func sequenceOK(test *testing.T, content []monketype.Content) {
+func sequenceOK(test *testing.T, content []types.Content) {
 	var index int
-	var it monketype.Content
+	var it types.Content
 
 	for index, it = range content[1:] {
 		if content[index].Created < it.Created {
@@ -63,17 +63,17 @@ func sequenceOK(test *testing.T, content []monketype.Content) {
 }
 
 func TestMain(main *testing.M) {
-	monkebase.Connect(os.Getenv("DATABASE_CONNECTION"))
+	database.Connect(os.Getenv("DATABASE_CONNECTION"))
 	seed(100)
 
 	var result int = main.Run()
-	monkebase.EmptyTable(monkebase.CONTENT_TABLE)
+	database.EmptyTable(database.CONTENT_TABLE)
 	os.Exit(result)
 }
 
 func Test_feedAll(test *testing.T) {
 	var targets [5]int = [5]int{10, 20, 30, 40, 50}
-	var content []monketype.Content
+	var content []types.Content
 	var request *http.Request
 	var code, size, target int
 	var r_map map[string]interface{}
@@ -96,7 +96,7 @@ func Test_feedAll(test *testing.T) {
 		}
 
 		size = r_map["size"].(map[string]int)["content"]
-		content = r_map["content"].([]monketype.Content)
+		content = r_map["content"].([]types.Content)
 
 		if size != target {
 			test.Errorf("bad reported size %d, want: %d", size, target)
@@ -112,7 +112,7 @@ func Test_feedAll(test *testing.T) {
 
 func Test_feedAll_after(test *testing.T) {
 	var target, offset int = 50, 11
-	var first, second []monketype.Content
+	var first, second []types.Content
 	var request *http.Request
 	var r_map map[string]interface{}
 	var err error
@@ -129,7 +129,7 @@ func Test_feedAll_after(test *testing.T) {
 		test.Fatal(err)
 	}
 
-	first = r_map["content"].([]monketype.Content)
+	first = r_map["content"].([]types.Content)
 
 	request = blank.WithContext(
 		context.WithValue(
@@ -143,13 +143,13 @@ func Test_feedAll_after(test *testing.T) {
 		test.Fatal(err)
 	}
 
-	second = r_map["content"].([]monketype.Content)
+	second = r_map["content"].([]types.Content)
 
 	sequenceOK(test, first)
 	sequenceOK(test, second)
 
 	var index int
-	var content monketype.Content
+	var content types.Content
 	for index, content = range first[offset+1:] {
 		if content.ID != second[index].ID {
 			test.Errorf("IDs are not aligned at %d: %s != %s", index, content.ID, second[index].ID)

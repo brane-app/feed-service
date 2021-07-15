@@ -14,7 +14,7 @@ var (
 )
 
 func register_handlers() {
-	groudon.RegisterMiddleware(middleware.PaginationParams)
+	groudon.AddMiddleware("GET", routeAll, middleware.PaginationParams)
 
-	groudon.RegisterHandler("GET", routeAll, feedAll)
+	groudon.AddHandler("GET", routeAll, feedAll)
 }
