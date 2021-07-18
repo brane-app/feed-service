@@ -7,7 +7,6 @@ import (
 	"context"
 	"net/http"
 	"net/url"
-	"os"
 	"testing"
 )
 
@@ -25,8 +24,8 @@ const (
 )
 
 var (
-	blank *http.Request  = new(http.Request)
-	user  types.User = types.NewUser(nick, "", email)
+	blank *http.Request = new(http.Request)
+	user  types.User    = types.NewUser(nick, "", email)
 )
 
 func seed(size int) {
@@ -62,13 +61,8 @@ func sequenceOK(test *testing.T, content []types.Content) {
 	}
 }
 
-func TestMain(main *testing.M) {
-	database.Connect(os.Getenv("DATABASE_CONNECTION"))
+func setup(main *testing.M) {
 	seed(100)
-
-	var result int = main.Run()
-	database.EmptyTable(database.CONTENT_TABLE)
-	os.Exit(result)
 }
 
 func Test_feedAll(test *testing.T) {
