@@ -1,4 +1,4 @@
-module github.com/brane-app/feed-giver-service
+module github.com/brane-app/feed-service
 
 go 1.13
 
